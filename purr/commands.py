@@ -30,7 +30,6 @@ def remote(fun):
             src = inspect.getsource(fun)
             startdef = src.find("def ")
             src = src[startdef:]
-            logging.error("exec %s", src)
             purr.send_purr_command('exec', src)
         return purr.send_purr_command('rfunc', fun.__name__, *args)
     return inner
