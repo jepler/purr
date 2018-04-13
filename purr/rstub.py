@@ -31,7 +31,6 @@ class RemoteStub:
         self.f_in = getattr(f_in, 'buffer', f_in)
         self.f_out = getattr(f_out, 'buffer', f_out)
         self.state = {}
-        self.func = None
 
     def eval(self, s): return eval(s, globals(), self.state)
 
@@ -99,9 +98,4 @@ class RemoteStub:
             else:
                 self.putb64(repr(result))
 
-    def rfunc(self, fname, fbody, *args):
-        locals = self.state
-        if self.func != (fname, fbody):
-            exec(fbody, globals(), locals)
-            self.func = (fname, fbody)
-        return locals[fname](self, *args)
+    def rfunc(self, fname, *args): return self.state[fname](self, *args)
