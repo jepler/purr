@@ -108,5 +108,21 @@ def ls(directory='/', long=False):
     else:
         rows = board.send_purr_command('os.listdir', directory)
     for r in rows: print(r)
+
+@cli.command()
+@click.argument('remote_file')
+def rm(remote_file):
+    board.send_purr_command('os.unlink', remote_file)
+
+@cli.command()
+@click.argument('remote_dir')
+def rmdir(remote_dir):
+    board.send_purr_command('os.rmdir', remote_dir)
+
+@cli.command()
+@click.argument('remote_dir')
+def mkdir(remote_dir):
+    board.send_purr_command('os.mkdir', remote_dir)
+
 if __name__ == '__main__':
     cli()
