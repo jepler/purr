@@ -86,7 +86,17 @@ class RemoteStub:
                 result = True, function(*args)
             except Exception as e:
                 result = False, e
-            self.putb64(repr(result))
+            if result[0] and type(result[1]).__name__ == 'generator':
+                self.putb64(repr('generator'))
+                try:
+                    for i in result[1]:
+                        self.putb64(repr((True, i)))
+                except Exception as e:
+                    self.putb64((False, e))
+                    return
+                self.putb64(repr(None))
+            else:
+                self.putb64(repr(result))
 
     def rfunc(self, fname, fbody, *args):
         locals = self.state

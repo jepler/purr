@@ -98,12 +98,27 @@ class PurrBoard:
     def getb64(self):
         return b"".join(self.getb64g())
     
+    def remote_generator_to_list(self):
+        r = []
+        while 1:
+            result = self.getb64()
+            result = eval(result)
+            if result is None:
+                break # StopIteration
+            if result[0]:
+                r.append(result[1])
+            else:
+                raise PurrError(result[1])
+        return r
+
     def send_purr_command(self, fun, *args):
         self.enter_purr()
         self.putb64(fun)
         self.putb64(repr(args).encode('utf-8'))
         result = self.getb64()
         result = eval(result)
+        if result == 'generator':
+            return self.remote_generator_to_list()
         if result[0]: return result[1]
         raise PurrError(result[1])
 
