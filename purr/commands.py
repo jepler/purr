@@ -95,14 +95,16 @@ def purrfile(purr, filename, mode='rb'):
     finally:
         close(purr)
 
-def getfile(purr, filename, mode='rb', chunksize=256):
-    blocks = []
-    with purrfile(purr, filename, mode):
+@remote
+def rgetfile(purr, filename, mode='rb', chunksize=256):
+    with open(filename, mode) as f:
         while 1:
-            block = read(purr, chunksize)
-            if not block: break
-            blocks.append(block)
-    return type(blocks[0])().join(blocks)
+            chunk = f.read(chunksize)
+            if not chunk: break
+            yield chunk
+
+def getfile(board, filename, mode='rb', chunksize=256):
+    return b''.join(rgetfile(board, filename, mode, chunksize))
 
 def putfile(purr, filename, content, mode='wb', chunksize=256):
     with purrfile(purr, filename, mode):
