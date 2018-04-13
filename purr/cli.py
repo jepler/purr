@@ -24,10 +24,12 @@ import posixpath
 import sys
 import tempfile
 
-from .board import purr_serial
+from .board import purr_serial, rstub_src
 import purr.commands as commands
 
 board = None
+
+def sq(x): return '\'' + x.replace('\'', '\'\\\'\'') + '\''
 
 @click.group()
 @click.option('--port', '-p', envvar='PURR_PORT', required=True,
@@ -103,7 +105,6 @@ def put_core(local_file, remote_file, skip_checksum):
 @click.argument('local_file')
 @click.argument('remote_file', required=False)
 def put(local_file, remote_file=None, skip_checksum=False, mpy_cross=None):
-    def sq(x): return '\'' + x.replace('\'', '\'\\\'\'') + '\''
     if mpy_cross and local_file.endswith(".py"):
         if remote_file is None:
             remote_file = os.path.split(local_file)
@@ -152,14 +153,34 @@ def reset():
 def maint():
     pass
 
+# Take care that remove_stub is usable even if there's a broken installed stub
 @maint.command()
 def remove_stub():
     board.enter_repl(force=True)
     board.write(b'__import__("os").unlink("/rstub.py")\r\n')
+    board.write(b'__import__("os").unlink("/rstub.mpy")\r\n')
 
 @maint.command()
-def upload_stub():
-    commands.putstub(board)
+@click.option('--mpy-cross', envvar='MPY_CROSS', help="If specified, invoke this mpy-cross to preprocess .py files for uploading.  Passed to the shell, so quote properly [Environment: MPY_CROSS]")
+def upload_stub(mpy_cross=None):
+    if mpy_cross:
+        lf = tempfile.NamedTemporaryFile(delete=False)
+        tf = tempfile.NamedTemporaryFile(delete=False)
+        try:
+            local_file = lf.name
+            remote_file = '/rstub.mpy'
+
+            lf.write(rstub_src)
+            lf.close()
+
+            tf.close()
+            os.system("%s -s rstub.py -o '%s' '%s'" % (mpy_cross, sq(tf.name), sq(local_file)))
+            put_core(tf.name, remote_file, False)
+        finally:
+            os.unlink(tf.name)
+            os.unlink(lf.name)
+    else:
+        commands.putstub(board)
 
 if __name__ == '__main__':
     cli()
