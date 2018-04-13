@@ -76,6 +76,11 @@ def rcat(remote_file):
     commands.putfile(board, remote_file, contents)
 
 @cli.command()
+@click.argument('remote_file')
+def checksum(remote_file):
+    print("{} {}".format(commands.checksum(board, remote_file)[1].decode('ascii', 'replace'), remote_file))
+
+@cli.command()
 def upload_stub():
     commands.putstub(board)
 
