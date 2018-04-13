@@ -75,7 +75,7 @@ def checksum(stub, filename, chunksize=256):
             sz += len(block)
             h.update(block)
         return sz, binascii.hexlify(h.digest())
-        
+
 
 @contextlib.contextmanager
 def purrfile(purr, filename, mode='rb'):
