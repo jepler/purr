@@ -145,9 +145,13 @@ class PurrBoard:
         logging.info("Mode switching took %fs", t1-t0)
 
         self.drain()
-        self.write(b"from rstub import RemoteStub\r\n")
+        self.write(b"RemoteStub\r\n")
         resp = self.read_until(b"\n>>> ")
-        logging.debug("result of importing: %r" % resp)
+        logging.debug("result of referring to RemoteStub: %r" % resp)
+        if b'Error' in resp:
+            self.write(b"from rstub import RemoteStub\r\n")
+            resp = self.read_until(b"\n>>> ")
+            logging.debug("result of importing: %r" % resp)
         if b'Error' in resp:
             logging.warn("Stub not installed -- consider uploading it with 'purr maint upload_stub' for faster start time")
             self.write(b"\5\r\n");
