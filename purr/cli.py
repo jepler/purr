@@ -94,6 +94,14 @@ def put(local_file, remote_file=None, skip_checksum=False):
     with open(local_file, "rb") as f: contents = f.read()
     commands.putfile(board, remote_file, contents)
 
-
+@cli.command()
+@click.option('-l', '--long', is_flag=True, help='Show file size (not POSIX ls compatible')
+@click.argument('directory', required=False, default='/')
+def ls(directory='/', long=False):
+    if long:
+        rows = commands.lsl(board, directory)
+    else:
+        rows = board.send_purr_command('os.listdir', directory)
+    for r in rows: print(r)
 if __name__ == '__main__':
     cli()

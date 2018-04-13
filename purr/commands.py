@@ -76,6 +76,16 @@ def checksum(stub, filename, chunksize=256):
             h.update(block)
         return sz, binascii.hexlify(h.digest())
 
+@remote
+def lsl(stub, location):
+    S_IFDIR = 16384
+    if not location.endswith("/"): location += "/"
+    for o in os.listdir(location):
+        st = os.stat(location + o)
+        if st[0] == S_IFDIR:
+            yield "{}/ - directory".format(o, st[6])
+        else:
+            yield "{} - {} bytes".format(o, st[6])
 
 @contextlib.contextmanager
 def purrfile(purr, filename, mode='rb'):
