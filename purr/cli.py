@@ -22,6 +22,7 @@ logging.basicConfig(level=os.environ.get("LOGLEVEL", "WARN"))
 import click
 import posixpath
 import sys
+import tempfile
 
 from .board import purr_serial
 import purr.commands as commands
@@ -85,11 +86,7 @@ def rcat(remote_file):
 def checksum(remote_file):
     print("{} {}".format(commands.checksum(board, remote_file)[1].decode('ascii', 'replace'), remote_file))
 
-@cli.command()
-@click.option('--skip-checksum', is_flag=True, help='Do not check for matching checksum')
-@click.argument('local_file')
-@click.argument('remote_file', required=False)
-def put(local_file, remote_file=None, skip_checksum=False):
+def put_core(local_file, remote_file, skip_checksum):
     if remote_file is None: remote_file = os.path.split(local_file)[-1]
     if not skip_checksum:
         c1 = local_checksum(local_file)
@@ -99,6 +96,27 @@ def put(local_file, remote_file=None, skip_checksum=False):
             return
     with open(local_file, "rb") as f: contents = f.read()
     commands.putfile(board, remote_file, contents)
+
+@cli.command()
+@click.option('--skip-checksum', is_flag=True, help='Do not check for matching checksum')
+@click.option('--mpy-cross', envvar='MPY_CROSS', help="If specified, invoke this mpy-cross to preprocess .py files for uploading.  Passed to the shell, so quote properly [Environment: MPY_CROSS]")
+@click.argument('local_file')
+@click.argument('remote_file', required=False)
+def put(local_file, remote_file=None, skip_checksum=False, mpy_cross=None):
+    def sq(x): return '\'' + x.replace('\'', '\'\\\'\'') + '\''
+    if mpy_cross and local_file.endswith(".py"):
+        if remote_file is None:
+            remote_file = os.path.split(local_file)
+            remote_file = os.path.splitext(local_file)[0] + ".mpy"
+        tf = tempfile.NamedTemporaryFile(delete=False)
+        tf.close()
+        try:
+            os.system("%s -o '%s' '%s'" % (mpy_cross, sq(tf.name), sq(local_file)))
+            put_core(tf.name, remote_file, skip_checksum)
+        finally:
+            os.unlink(tf.name)
+    else:
+        put_core(local_file, remote_file, skip_checksum)
 
 @cli.command()
 @click.option('-l', '--long', is_flag=True, help='Show file size (not POSIX ls compatible')
