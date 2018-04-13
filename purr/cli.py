@@ -129,5 +129,10 @@ def rmdir(remote_dir):
 def mkdir(remote_dir):
     board.send_purr_command('os.mkdir', remote_dir)
 
+@cli.command()
+def reset():
+    board.enter_repl(force=True)
+    board.enter_run()
+
 if __name__ == '__main__':
     cli()
