@@ -158,6 +158,7 @@ class PurrBoard:
             t0 = time.monotonic()
             for line in rstub_src.rstrip().split(b"\n"):
                 if not line: continue
+                if line.startswith(b"#"): continue
                 line = line.replace(b"    ", b" ")
                 self.read_until(b"===");
                 self.write(line + b"\r\n")
