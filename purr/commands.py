@@ -113,3 +113,10 @@ def putfile(purr, filename, content, mode='wb', chunksize=256):
 
 def putstub(purr):
     putfile(purr, "/rstub.py", rstub_src)
+
+@remote
+def uname(stub):
+    import os
+    u = os.uname()
+    return dict((k, getattr(u, k)) for k in ('sysname', 'nodename', 'release', 'version', 'machine'))
+

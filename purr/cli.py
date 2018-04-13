@@ -64,6 +64,11 @@ def get(remote_file, local_file=None, skip_checksum=True):
     logging.info("Transferred %d bytes", len(contents))
 
 @cli.command()
+def identify():
+    u = commands.uname(board)
+    print("{} with {}".format(u['machine'] , u['version']))
+
+@cli.command()
 @click.argument('remote_file')
 def cat(remote_file):
     contents = commands.getfile(board, remote_file)
