@@ -191,7 +191,7 @@ class PurrBoard:
 
 class CommSerial:
     def __init__(self, port, rate=115200):
-        self.serial = serial.Serial(port, rate, interCharTimeout=1)
+        self.serial = serial.serial_for_url(port, rate, interCharTimeout=1)
 
     def read_deadline(self, min_bytes, t_end):
         data = b''
