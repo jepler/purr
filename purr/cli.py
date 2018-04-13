@@ -86,10 +86,6 @@ def checksum(remote_file):
     print("{} {}".format(commands.checksum(board, remote_file)[1].decode('ascii', 'replace'), remote_file))
 
 @cli.command()
-def upload_stub():
-    commands.putstub(board)
-
-@cli.command()
 @click.option('--skip-checksum', is_flag=True, help='Do not check for matching checksum')
 @click.argument('local_file')
 @click.argument('remote_file', required=False)
@@ -133,6 +129,19 @@ def mkdir(remote_dir):
 def reset():
     board.enter_repl(force=True)
     board.enter_run()
+
+@cli.group()
+def maint():
+    pass
+
+@maint.command()
+def remove_stub():
+    board.enter_repl(force=True)
+    board.write(b'__import__("os").unlink("/rstub.py")\r\n')
+
+@maint.command()
+def upload_stub():
+    commands.putstub(board)
 
 if __name__ == '__main__':
     cli()
