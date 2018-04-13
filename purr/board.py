@@ -75,12 +75,13 @@ class PurrBoard:
         return self.read_until(b'\n', timeout=timeout, t_end=t_end)
 
     def putb64(self, s):
-        self.write(b"\n__STUB__\n"); self.read_until(b'.')
+        self.write(b"\n__STUB__\n");
         if not isinstance(s, bytes): s = s.encode('utf-8')
         mv = memoryview(s)
         for i in range(0, len(s), 90):
             v = mv[i:i+90]
-            self.write(binascii.b2a_base64(v)); self.read_until(b'.')
+            self.write(binascii.b2a_base64(v))
+            self.read_until(b'.')
         self.write(b"~~STUB~~\n"); self.read_until(b'\n')
 
     def getb64g(self):
