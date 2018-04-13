@@ -164,6 +164,7 @@ class PurrBoard:
         else:
             logging.info("Using preinstalled stub")
         self.write(b"RemoteStub().loop()\r\n")
+        self.getb64()
         self.state = PURR_STATE_PURR
 
     def enter_repl(self, force=False, timeout=16, t_end=0):

@@ -74,6 +74,7 @@ class RemoteStub:
         return getattr(obj, function)
 
     def loop(self):
+        self.putb64(b'')
         while 1:
             function = self.getb64()
             if function == b'exit':
