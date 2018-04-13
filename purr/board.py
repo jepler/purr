@@ -149,9 +149,8 @@ class PurrBoard:
         resp = self.read_until(b"\n>>> ")
         logging.debug("result of importing: %r" % resp)
         if b'Error' in resp:
-            logging.info("Stub not installed")
-            logging.info("consider uploading it for faster start time")
-            self.write(b"\5");
+            logging.warn("Stub not installed -- consider uploading it with 'purr maint upload_stub' for faster start time")
+            self.write(b"\5\r\n");
             t0 = time.monotonic()
             for line in rstub_src.rstrip().split(b"\n"):
                 if not line: continue
