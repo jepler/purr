@@ -30,7 +30,7 @@ board = None
 
 @click.group()
 @click.option('--port', '-p', envvar='PURR_PORT', required=True,
-    type=click.STRING, help='''Serial port to use.  Can also specify via PURR_PORT environment variable''')
+    type=click.STRING, help='''Serial port to use.  [Environment: PURR_PORT]''')
 @click.option('--baud', '-b', default=115200, type=click.INT,
     help='''Baud rate''')
 def cli(port, baud):
