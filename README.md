@@ -14,7 +14,8 @@ for daily use.
 
 At this time, purr is only tested on Debian Stable with Python 3.5.3.  The
 remote board for most testing has been a Feather HUZZAH 8266 with CircuitPython
-2.x
+2.x.  Other boards probably do not have the required `ubinascii` and `uhashlib`
+modules.
 
 # Installation
 
@@ -33,7 +34,7 @@ $ purr --help
 consumes around 3000 bytes of storage.
 
 ```
-$ purr -p /dev/ttyUSB0 upload_stub
+$ purr -p /dev/ttyUSB0 maint upload_stub
 ```
 
 # Use in another Python program
@@ -122,3 +123,6 @@ def uname(stub):
 >>> mycommands.uname(p)
 ('esp8266', 'esp8266', '2.2.0-dev(9422289)', '2.2.4-4-g1062e193e on 2018-04-06', 'ESP module with ESP8266')
 ```
+
+Within a purr session, all the `@purr.commands` must have distinct unqualified
+names.  Failure to do so will cause the wrong command to be executed.
