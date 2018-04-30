@@ -99,13 +99,16 @@ def put_core(local_file, remote_file, skip_checksum):
     with open(local_file, "rb") as f: contents = f.read()
     commands.putfile(board, remote_file, contents)
 
+def mpy_blacklist(fn):
+    return fn in ['main.py', 'init.py']
+
 @cli.command()
 @click.option('--skip-checksum', is_flag=True, help='Do not check for matching checksum')
 @click.option('--mpy-cross', envvar='MPY_CROSS', help="If specified, invoke this mpy-cross to preprocess .py files for uploading.  Passed to the shell, so quote properly [Environment: MPY_CROSS]")
 @click.argument('local_file')
 @click.argument('remote_file', required=False)
 def put(local_file, remote_file=None, skip_checksum=False, mpy_cross=None):
-    if mpy_cross and local_file.endswith(".py"):
+    if mpy_cross and local_file.endswith(".py") and not mpy_blacklist(remote_file or os.path.split(local_file)[-1]):
         if remote_file is None: remote_file = os.path.split(local_file)[-1]
         remote_file = os.path.splitext(remote_file)[0] + ".mpy"
         tf = tempfile.NamedTemporaryFile(delete=False)
