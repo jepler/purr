@@ -106,9 +106,8 @@ def put_core(local_file, remote_file, skip_checksum):
 @click.argument('remote_file', required=False)
 def put(local_file, remote_file=None, skip_checksum=False, mpy_cross=None):
     if mpy_cross and local_file.endswith(".py"):
-        if remote_file is None:
-            remote_file = os.path.split(local_file)
-            remote_file = os.path.splitext(local_file)[0] + ".mpy"
+        if remote_file is None: remote_file = os.path.split(local_file)[-1]
+        remote_file = os.path.splitext(remote_file)[0] + ".mpy"
         tf = tempfile.NamedTemporaryFile(delete=False)
         tf.close()
         try:
