@@ -41,7 +41,6 @@ def cli(port, baud):
     board = purr_serial(port, baud)
 
 def local_checksum(filename):
-    print("local_checksum", filename)
     import hashlib
     if not os.access(filename, os.F_OK): return None
     with open(filename, 'rb') as f:
