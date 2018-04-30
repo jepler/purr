@@ -26,6 +26,9 @@ except:
 
 import sys
 
+def gen(): yield
+gentype = type(gen())
+
 class RemoteStub:
     def __init__(self, f_in=sys.stdin, f_out=sys.stdout):
         self.f_in = getattr(f_in, 'buffer', f_in)
@@ -75,18 +78,20 @@ class RemoteStub:
     def loop(self):
         self.putb64(b'')
         while 1:
-            function = self.getb64()
-            if function == b'exit':
-                return
-            args = self.getb64()
-
             try:
-                function = self.getfunction(function.decode('ascii'))
-                args = eval(args)
+                funcargs = self.getb64()
+                print("X", funcargs)
+                function, args = eval(funcargs)
+                print("Y")
+                if function == 'exit':
+                    return
+
+                function = self.getfunction(function)
                 result = True, function(*args)
             except Exception as e:
+                sys.print_exception(e)
                 result = False, e
-            if result[0] and type(result[1]).__name__ == 'generator':
+            if result[0] and type(result[1]) is gentype:
                 self.putb64(repr('generator'))
                 try:
                     for i in result[1]:

@@ -114,8 +114,7 @@ class PurrBoard:
 
     def send_purr_command(self, fun, *args):
         self.enter_purr()
-        self.putb64(fun)
-        self.putb64(repr(args).encode('utf-8'))
+        self.putb64(repr((fun, args)).encode('utf-8'))
         result = self.getb64()
         result = eval(result)
         if result == 'generator':
